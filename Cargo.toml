@@ -1,3 +1,3 @@
 [workspace]
-members = ["todo-cli"]
+members = [ "hangman-cli","todo-cli"]
 resolver = "2"
