@@ -13,3 +13,5 @@ Simple list of ideas with links to the code, and any explanation that we want to
 ## Implemented In
 
 One we implement an idea we can move it to this section and link to the Byte it relates to
+
+- Simple Todo List with broken file persistance - [Level 0.0](https://coreyja.cookd.dev/level-0-0)
