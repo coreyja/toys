@@ -14,4 +14,4 @@ Simple list of ideas with links to the code, and any explanation that we want to
 
 One we implement an idea we can move it to this section and link to the Byte it relates to
 
-- Simple Todo List with broken file persistance - [Level 0.0](https://coreyja.cookd.dev/level-0-0)
+- Simple Todo List with broken file persistance [PR #1](https://github.com/coreyja/toys/pull/1) - [Level 0.0](https://coreyja.cookd.dev/level-0-0)
