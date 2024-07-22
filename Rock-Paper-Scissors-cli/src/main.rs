@@ -25,6 +25,32 @@ fn determine_winner<'a>(player: &'a str, computer: &'a str) -> &'a str {
     match (player, computer) {
         ("rock", "scissors") | ("scissors", "paper") | ("paper", "rock") => "You win!",
         ("scissors", "rock") | ("paper", "scissors") | ("rock", "paper") => "Computer wins!",
-        _ => "It's a tie!",
+        ("rock", "rock") | ("paper", "paper") | ("scissors", "scissors") => "It's a tie!",
+        _ => "Invalid input. Choose between rock, paper, and scissors.",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_player_wins() {
+        assert_eq!(determine_winner("rock", "scissors"), "You win!");
+    }
+
+    #[test]
+    fn test_computer_wins() {
+        assert_eq!(determine_winner("scissors", "rock"), "Computer wins!");
+    }
+
+    #[test]
+    fn test_tie() {
+        assert_eq!(determine_winner("rock", "rock"), "It's a tie!");
+    }
+
+    #[test]
+    fn test_invalid_input() {
+        assert_eq!(determine_winner("invalid", "rock"), "Invalid input. Choose between rock, paper, and scissors.");
     }
 }
