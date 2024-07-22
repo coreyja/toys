@@ -7,33 +7,42 @@ enum Player {
     Computer,
 }
 
+#[derive(Clone)]
 struct Game {
     board: [Option<Player>; 9],
     current_player: Player,
 }
 
 impl Game {
+    const BOARD_SIZE: usize = 9;
+    const BOARD_SIDE: usize = 3;
+    const MAX_DEPTH: i32 = 5;
+    const SCORE_WIN: i32 = 10;
+    const SCORE_LOSE: i32 = -10;
+    const SCORE_DRAW: i32 = 0;
+    const SCORE_CONTINUE: i32 = -1;
+
     fn new() -> Self {
         Game {
-            board: [None; 9],
+            board: [None; Self::BOARD_SIZE],
             current_player: Player::Human,
         }
     }
 
     fn print_board(&self) {
-        for i in 0..3 {
-            for j in 0..3 {
-                match self.board[i * 3 + j] {
+        for i in 0..Self::BOARD_SIDE {
+            for j in 0..Self::BOARD_SIDE {
+                match self.board[i * Self::BOARD_SIDE + j] {
                     Some(Player::Human) => print!("X"),
                     Some(Player::Computer) => print!("O"),
                     None => print!("."),
                 }
-                if j < 2 {
+                if j < Self::BOARD_SIDE - 1 {
                     print!(" | ");
                 }
             }
             println!();
-            if i < 2 {
+            if i < Self::BOARD_SIDE - 1 {
                 println!("---------");
             }
         }
@@ -41,7 +50,7 @@ impl Game {
     }
 
     fn make_move(&mut self, position: usize) -> bool {
-        if position < 9 && self.board[position].is_none() {
+        if position < Self::BOARD_SIZE && self.board[position].is_none() {
             self.board[position] = Some(self.current_player);
             self.current_player = match self.current_player {
                 Player::Human => Player::Computer,
@@ -75,14 +84,72 @@ impl Game {
         self.board.iter().all(|&cell| cell.is_some())
     }
 
-    fn get_computer_move(&self) -> usize {
-        let mut rng = rand::thread_rng();
-        loop {
-            let position = rng.gen_range(0..9);
-            if self.board[position].is_none() {
-                return position;
+    fn evaluate_board(&self) -> i32 {
+        if let Some(winner) = self.check_winner() {
+            match winner {
+                Player::Computer => Self::SCORE_WIN,
+                Player::Human => Self::SCORE_LOSE,
+            }
+        } else if self.is_full() {
+            Self::SCORE_DRAW
+        } else {
+            Self::SCORE_CONTINUE
+        }
+    }
+
+    fn minimax(&self, depth: i32, is_maximizing: bool) -> i32 {
+        let score = self.evaluate_board();
+
+        if score != Self::SCORE_CONTINUE || depth == 0 {
+            return score;
+        }
+
+        if is_maximizing {
+            let mut best_score = std::i32::MIN;
+            for i in 0..Self::BOARD_SIZE {
+                if self.board[i].is_none() {
+                    let mut new_game = Game { board: self.board, current_player: self.current_player };
+                    new_game.board[i] = Some(Player::Computer);
+                    let score = new_game.minimax(Self::MAX_DEPTH - 1, false);
+                    best_score = best_score.max(score);
+                }
+            }
+            best_score
+        } else {
+            let mut best_score = std::i32::MAX;
+            for i in 0..Self::BOARD_SIZE {
+                if self.board[i].is_none() {
+                    let mut new_game = Game { board: self.board, current_player: self.current_player };
+                    new_game.board[i] = Some(Player::Human);
+                    let score = new_game.minimax(Self::MAX_DEPTH - 1, true);
+                    best_score = best_score.min(score);
+                }
+            }
+            best_score
+        }
+    }
+
+    fn get_best_move(&self) -> usize {
+        let mut best_score = std::i32::MIN;
+        let mut best_move = 0;
+
+        for i in 0..Self::BOARD_SIZE {
+            if self.board[i].is_none() {
+                let mut new_game = Game { board: self.board, current_player: self.current_player };
+                new_game.board[i] = Some(Player::Computer);
+                let score = new_game.minimax(Self::MAX_DEPTH, false );
+                if score > best_score {
+                    best_score = score;
+                    best_move = i;
+                }
             }
         }
+
+        best_move
+    }
+
+    fn get_computer_move(&self) -> usize {
+        self.get_best_move()
     }
 }
 
@@ -103,7 +170,7 @@ fn main() {
         }
 
         let position = if game.current_player == Player::Human {
-            print!("Enter your move (0-8): ");
+            print!("Enter your move (0-{}): ", Game::BOARD_SIZE - 1);
             io::stdout().flush().unwrap();
 
             let mut input = String::new();
