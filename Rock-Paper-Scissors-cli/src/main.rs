@@ -20,7 +20,7 @@ fn main() {
     io::stdin().read_line(&mut player_choice).unwrap();
     let player_choice = player_choice.trim().to_lowercase();
 
-    let winner = determine_winner(&player_choice, &computer_choice);
+    let winner = determine_winner(&player_choice, computer_choice);
     println!("{}", winner);
     println!("You chose: {}", player_choice);
     println!("Computer chose: {:?}", computer_choice);
