@@ -1,5 +1,5 @@
-use std::io::{self, Write};
 use rand::Rng;
+use std::io::{self, Write};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum Player {
@@ -64,13 +64,22 @@ impl Game {
 
     fn check_winner(&self) -> Option<Player> {
         let winning_combinations = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-            [0, 4, 8], [2, 4, 6],           
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
         ];
 
         for combo in winning_combinations.iter() {
-            if let (Some(player), Some(b), Some(c)) = (self.board[combo[0]], self.board[combo[1]], self.board[combo[2]]) {
+            if let (Some(player), Some(b), Some(c)) = (
+                self.board[combo[0]],
+                self.board[combo[1]],
+                self.board[combo[2]],
+            ) {
                 if player == b && player == c {
                     return Some(player);
                 }
@@ -104,29 +113,33 @@ impl Game {
             return score;
         }
 
-        if is_maximizing {
-            let mut best_score = std::i32::MIN;
-            for i in 0..Self::BOARD_SIZE {
-                if self.board[i].is_none() {
-                    let mut new_game = Game { board: self.board, current_player: self.current_player };
-                    new_game.board[i] = Some(Player::Computer);
-                    let score = new_game.minimax(Self::MAX_DEPTH - 1, false);
-                    best_score = best_score.max(score);
-                }
-            }
-            best_score
+        let mut best_score = if is_maximizing {
+            std::i32::MIN
         } else {
-            let mut best_score = std::i32::MAX;
-            for i in 0..Self::BOARD_SIZE {
-                if self.board[i].is_none() {
-                    let mut new_game = Game { board: self.board, current_player: self.current_player };
-                    new_game.board[i] = Some(Player::Human);
-                    let score = new_game.minimax(Self::MAX_DEPTH - 1, true);
-                    best_score = best_score.min(score);
-                }
+            std::i32::MAX
+        };
+
+        for i in 0..Self::BOARD_SIZE {
+            if self.board[i].is_none() {
+                let mut new_game = Game {
+                    board: self.board,
+                    current_player: self.current_player,
+                };
+                new_game.board[i] = Some(if is_maximizing {
+                    Player::Computer
+                } else {
+                    Player::Human
+                });
+                let score = new_game.minimax(depth - 1, !is_maximizing);
+                best_score = if is_maximizing {
+                    best_score.max(score)
+                } else {
+                    best_score.min(score)
+                };
             }
-            best_score
         }
+
+        best_score
     }
 
     fn get_best_move(&self) -> usize {
@@ -135,9 +148,12 @@ impl Game {
 
         for i in 0..Self::BOARD_SIZE {
             if self.board[i].is_none() {
-                let mut new_game = Game { board: self.board, current_player: self.current_player };
+                let mut new_game = Game {
+                    board: self.board,
+                    current_player: self.current_player,
+                };
                 new_game.board[i] = Some(Player::Computer);
-                let score = new_game.minimax(Self::MAX_DEPTH, false );
+                let score = new_game.minimax(Self::MAX_DEPTH, false);
                 if score > best_score {
                     best_score = score;
                     best_move = i;
@@ -160,7 +176,14 @@ fn main() {
         game.print_board();
 
         if let Some(winner) = game.check_winner() {
-            println!("{} wins!", if winner == Player::Human { "You" } else { "Computer" });
+            println!(
+                "{} wins!",
+                if winner == Player::Human {
+                    "You"
+                } else {
+                    "Computer"
+                }
+            );
             break;
         }
 
