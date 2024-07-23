@@ -39,15 +39,24 @@ fn main() {
 }
 
 fn choose_word(word_list: &[&str]) -> String {
-    word_list.choose(&mut rand::thread_rng()).unwrap().to_string()
+    word_list
+        .choose(&mut rand::thread_rng())
+        .unwrap()
+        .to_string()
 }
 
 fn display_state(secret_word: &str, guessed_letters: &HashSet<char>, attempts_left: usize) {
     let display_word: String = secret_word
         .chars()
-        .map(|letter| if guessed_letters.contains(&letter) { letter } else { '_' })
+        .map(|letter| {
+            if guessed_letters.contains(&letter) {
+                letter
+            } else {
+                '_'
+            }
+        })
         .collect();
-    
+
     println!("Word: {}", display_word);
     println!("Attempts left: {}", attempts_left);
 }
