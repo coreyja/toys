@@ -10,10 +10,17 @@ This document is a place to jot down how different diffs/commits might make good
 Simple list of ideas with links to the code, and any explanation that we want to record
 
 
+
+
+
+
+
+- Rock-Paper-Scissors CLI Potential Bugs:
+    - Remove from ":?" from the curly braces on line 27
+    - remove the ".trim()" from the input validation on line 21
+
 ## Implemented In
 
 One we implement an idea we can move it to this section and link to the Byte it relates to
 
 - Simple Todo List with broken file persistance [PR #1](https://github.com/coreyja/toys/pull/1) - [Level 0.0](https://coreyja.cookd.dev/level-0-0)
-- Rock-Paper-Scissors CLI [PR #2](https://github.com/coreyja/toys/pull/2) - [Level 0.1](cookd_link)
-- Tic Tac Toe CLI [PR #3](https://github.com/coreyja/toys/pull/3) - [Level 0.2](cookd_link)

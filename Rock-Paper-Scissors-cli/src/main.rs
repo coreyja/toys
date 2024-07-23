@@ -20,7 +20,6 @@ fn main() {
     io::stdin().read_line(&mut player_choice).unwrap();
     let player_choice = player_choice.trim().to_lowercase();
 
-    
     let winner = determine_winner(&player_choice, &computer_choice);
     println!("{}", winner);
     println!("You chose: {}", player_choice);
@@ -29,9 +28,15 @@ fn main() {
 
 fn determine_winner<'a>(player: &'a str, computer: &'a Choice) -> &'a str {
     match (player, computer) {
-        ("rock", Choice::Scissors) | ("scissors", Choice::Paper) | ("paper", Choice::Rock) => "You win!",
-        ("scissors", Choice::Rock) | ("paper", Choice::Scissors) | ("rock", Choice::Paper) => "Computer wins!",
-        ("rock", Choice::Rock) | ("paper", Choice::Paper) | ("scissors", Choice::Scissors) => "It's a tie!",
+        ("rock", Choice::Scissors) | ("scissors", Choice::Paper) | ("paper", Choice::Rock) => {
+            "You win!"
+        }
+        ("scissors", Choice::Rock) | ("paper", Choice::Scissors) | ("rock", Choice::Paper) => {
+            "Computer wins!"
+        }
+        ("rock", Choice::Rock) | ("paper", Choice::Paper) | ("scissors", Choice::Scissors) => {
+            "It's a tie!"
+        }
         _ => "Invalid input. Choose between rock, paper, and scissors.",
     }
 }
@@ -47,7 +52,10 @@ mod tests {
 
     #[test]
     fn test_computer_wins() {
-        assert_eq!(determine_winner("scissors", &Choice::Rock), "Computer wins!");
+        assert_eq!(
+            determine_winner("scissors", &Choice::Rock),
+            "Computer wins!"
+        );
     }
 
     #[test]
@@ -57,6 +65,9 @@ mod tests {
 
     #[test]
     fn test_invalid_input() {
-        assert_eq!(determine_winner("invalid", &Choice::Rock), "Invalid input. Choose between rock, paper, and scissors.");
+        assert_eq!(
+            determine_winner("invalid", &Choice::Rock),
+            "Invalid input. Choose between rock, paper, and scissors."
+        );
     }
 }
