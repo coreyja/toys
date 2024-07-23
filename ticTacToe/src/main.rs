@@ -19,7 +19,6 @@ impl Game {
     const SCORE_WIN: i32 = 10;
     const SCORE_LOSE: i32 = -10;
     const SCORE_DRAW: i32 = 0;
-    const SCORE_CONTINUE: i32 = -1;
 
     fn new() -> Self {
         Game {
@@ -111,23 +110,21 @@ impl Game {
         self.board.iter().all(|&cell| cell.is_some())
     }
 
-    fn evaluate_board(&self) -> i32 {
+    fn evaluate_board(&self) -> Option<i32> {
         if let Some(winner) = self.check_winner() {
             match winner {
-                Player::Computer => Self::SCORE_WIN,
-                Player::Human => Self::SCORE_LOSE,
+                Player::Computer => Some(Self::SCORE_WIN),
+                Player::Human => Some(Self::SCORE_LOSE),
             }
         } else if self.is_full() {
-            Self::SCORE_DRAW
+            Some(Self::SCORE_DRAW)
         } else {
-            Self::SCORE_CONTINUE
+            None
         }
     }
 
     fn minimax(&self, is_maximizing: bool) -> i32 {
-        let score = self.evaluate_board();
-
-        if score != Self::SCORE_CONTINUE {
+        if let Some(score) = self.evaluate_board() {
             return score;
         }
 
