@@ -62,17 +62,33 @@ impl Game {
         }
     }
 
+    fn winning_combinations() -> Vec<[usize; 3]> {
+        let mut combinations = Vec::new();
+
+        for i in 0..Self::BOARD_SIDE {
+            combinations.push([
+                i * Self::BOARD_SIDE,
+                i * Self::BOARD_SIDE + 1,
+                i * Self::BOARD_SIDE + 2,
+            ]);
+        }
+
+        for i in 0..Self::BOARD_SIDE {
+            combinations.push([
+                i,
+                i + Self::BOARD_SIDE,
+                i + 2 * Self::BOARD_SIDE,
+            ]);
+        }
+
+        combinations.push([0, 4, 8]);
+        combinations.push([2, 4, 6]);
+
+        combinations
+    }
+
     fn check_winner(&self) -> Option<Player> {
-        let winning_combinations = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6],
-        ];
+        let winning_combinations = Self::winning_combinations();
 
         for combo in winning_combinations.iter() {
             if let (Some(player), Some(b), Some(c)) = (
@@ -148,12 +164,9 @@ impl Game {
 
         for i in 0..Self::BOARD_SIZE {
             if self.board[i].is_none() {
-                let mut new_game = Game {
-                    board: self.board,
-                    current_player: self.current_player,
-                };
+                let mut new_game = self.clone();
                 new_game.board[i] = Some(Player::Computer);
-                let score = new_game.minimax(Self::MAX_DEPTH, false);
+                let score = new_game.minimax(Self::MAX_DEPTH - 1, false);
                 if score > best_score {
                     best_score = score;
                     best_move = i;
