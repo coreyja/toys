@@ -16,7 +16,6 @@ struct Game {
 impl Game {
     const BOARD_SIZE: usize = 9;
     const BOARD_SIDE: usize = 3;
-    const MAX_DEPTH: i32 = 5;
     const SCORE_WIN: i32 = 10;
     const SCORE_LOSE: i32 = -10;
     const SCORE_DRAW: i32 = 0;
@@ -65,6 +64,7 @@ impl Game {
     fn winning_combinations() -> Vec<[usize; 3]> {
         let mut combinations = Vec::new();
 
+        // Horizontal rows
         for i in 0..Self::BOARD_SIDE {
             combinations.push([
                 i * Self::BOARD_SIDE,
@@ -73,6 +73,7 @@ impl Game {
             ]);
         }
 
+        // Vertical columns
         for i in 0..Self::BOARD_SIDE {
             combinations.push([
                 i,
@@ -81,6 +82,7 @@ impl Game {
             ]);
         }
 
+        // Diagonals
         combinations.push([0, 4, 8]);
         combinations.push([2, 4, 6]);
 
@@ -122,10 +124,10 @@ impl Game {
         }
     }
 
-    fn minimax(&self, depth: i32, is_maximizing: bool) -> i32 {
+    fn minimax(&self, is_maximizing: bool) -> i32 {
         let score = self.evaluate_board();
 
-        if score != Self::SCORE_CONTINUE || depth == 0 {
+        if score != Self::SCORE_CONTINUE {
             return score;
         }
 
@@ -137,16 +139,13 @@ impl Game {
 
         for i in 0..Self::BOARD_SIZE {
             if self.board[i].is_none() {
-                let mut new_game = Game {
-                    board: self.board,
-                    current_player: self.current_player,
-                };
+                let mut new_game = self.clone();
                 new_game.board[i] = Some(if is_maximizing {
                     Player::Computer
                 } else {
                     Player::Human
                 });
-                let score = new_game.minimax(depth - 1, !is_maximizing);
+                let score = new_game.minimax(!is_maximizing);
                 best_score = if is_maximizing {
                     best_score.max(score)
                 } else {
@@ -166,7 +165,7 @@ impl Game {
             if self.board[i].is_none() {
                 let mut new_game = self.clone();
                 new_game.board[i] = Some(Player::Computer);
-                let score = new_game.minimax(Self::MAX_DEPTH - 1, false);
+                let score = new_game.minimax(false);
                 if score > best_score {
                     best_score = score;
                     best_move = i;
