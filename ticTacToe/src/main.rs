@@ -1,4 +1,3 @@
-use rand::Rng;
 use std::io::{self, Write};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -121,11 +120,7 @@ impl Game {
             return score;
         }
 
-        let mut best_score = if is_maximizing {
-            std::i32::MIN
-        } else {
-            std::i32::MAX
-        };
+        let mut best_score = if is_maximizing { i32::MIN } else { i32::MAX };
 
         for i in 0..Self::BOARD_SIDE {
             for j in 0..Self::BOARD_SIDE {
@@ -150,7 +145,7 @@ impl Game {
     }
 
     fn get_best_move(&self) -> (usize, usize) {
-        let mut best_score = std::i32::MIN;
+        let mut best_score = i32::MIN;
         let mut best_move = (0, 0);
 
         for i in 0..Self::BOARD_SIDE {
