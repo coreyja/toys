@@ -9,12 +9,11 @@ enum Player {
 
 #[derive(Clone)]
 struct Game {
-    board: [Option<Player>; 9],
+    board: [[Option<Player>; 3]; 3],
     current_player: Player,
 }
 
 impl Game {
-    const BOARD_SIZE: usize = 9;
     const BOARD_SIDE: usize = 3;
     const SCORE_WIN: i32 = 10;
     const SCORE_LOSE: i32 = -10;
@@ -22,7 +21,7 @@ impl Game {
 
     fn new() -> Self {
         Game {
-            board: [None; Self::BOARD_SIZE],
+            board: [[None; Self::BOARD_SIDE]; Self::BOARD_SIDE],
             current_player: Player::Human,
         }
     }
@@ -30,7 +29,7 @@ impl Game {
     fn print_board(&self) {
         for i in 0..Self::BOARD_SIDE {
             for j in 0..Self::BOARD_SIDE {
-                match self.board[i * Self::BOARD_SIDE + j] {
+                match self.board[i][j] {
                     Some(Player::Human) => print!("X"),
                     Some(Player::Computer) => print!("O"),
                     None => print!("."),
@@ -47,9 +46,9 @@ impl Game {
         println!();
     }
 
-    fn make_move(&mut self, position: usize) -> bool {
-        if position < Self::BOARD_SIZE && self.board[position].is_none() {
-            self.board[position] = Some(self.current_player);
+    fn make_move(&mut self, x: usize, y: usize) -> bool {
+        if x < Self::BOARD_SIDE && y < Self::BOARD_SIDE && self.board[x][y].is_none() {
+            self.board[x][y] = Some(self.current_player);
             self.current_player = match self.current_player {
                 Player::Human => Player::Computer,
                 Player::Computer => Player::Human,
@@ -60,30 +59,22 @@ impl Game {
         }
     }
 
-    fn winning_combinations() -> Vec<[usize; 3]> {
+    fn winning_combinations() -> Vec<[(usize, usize); 3]> {
         let mut combinations = Vec::new();
 
         // Horizontal rows
         for i in 0..Self::BOARD_SIDE {
-            combinations.push([
-                i * Self::BOARD_SIDE,
-                i * Self::BOARD_SIDE + 1,
-                i * Self::BOARD_SIDE + 2,
-            ]);
+            combinations.push([(i, 0), (i, 1), (i, 2)]);
         }
 
         // Vertical columns
         for i in 0..Self::BOARD_SIDE {
-            combinations.push([
-                i,
-                i + Self::BOARD_SIDE,
-                i + 2 * Self::BOARD_SIDE,
-            ]);
+            combinations.push([(0, i), (1, i), (2, i)]);
         }
 
         // Diagonals
-        combinations.push([0, 4, 8]);
-        combinations.push([2, 4, 6]);
+        combinations.push([(0, 0), (1, 1), (2, 2)]);
+        combinations.push([(0, 2), (1, 1), (2, 0)]);
 
         combinations
     }
@@ -93,9 +84,9 @@ impl Game {
 
         for combo in winning_combinations.iter() {
             if let (Some(player), Some(b), Some(c)) = (
-                self.board[combo[0]],
-                self.board[combo[1]],
-                self.board[combo[2]],
+                self.board[combo[0].0][combo[0].1],
+                self.board[combo[1].0][combo[1].1],
+                self.board[combo[2].0][combo[2].1],
             ) {
                 if player == b && player == c {
                     return Some(player);
@@ -107,7 +98,9 @@ impl Game {
     }
 
     fn is_full(&self) -> bool {
-        self.board.iter().all(|&cell| cell.is_some())
+        self.board
+            .iter()
+            .all(|row| row.iter().all(|&cell| cell.is_some()))
     }
 
     fn evaluate_board(&self) -> Option<i32> {
@@ -134,38 +127,42 @@ impl Game {
             std::i32::MAX
         };
 
-        for i in 0..Self::BOARD_SIZE {
-            if self.board[i].is_none() {
-                let mut new_game = self.clone();
-                new_game.board[i] = Some(if is_maximizing {
-                    Player::Computer
-                } else {
-                    Player::Human
-                });
-                let score = new_game.minimax(!is_maximizing);
-                best_score = if is_maximizing {
-                    best_score.max(score)
-                } else {
-                    best_score.min(score)
-                };
+        for i in 0..Self::BOARD_SIDE {
+            for j in 0..Self::BOARD_SIDE {
+                if self.board[i][j].is_none() {
+                    let mut new_game = self.clone();
+                    new_game.board[i][j] = Some(if is_maximizing {
+                        Player::Computer
+                    } else {
+                        Player::Human
+                    });
+                    let score = new_game.minimax(!is_maximizing);
+                    best_score = if is_maximizing {
+                        best_score.max(score)
+                    } else {
+                        best_score.min(score)
+                    };
+                }
             }
         }
 
         best_score
     }
 
-    fn get_best_move(&self) -> usize {
+    fn get_best_move(&self) -> (usize, usize) {
         let mut best_score = std::i32::MIN;
-        let mut best_move = 0;
+        let mut best_move = (0, 0);
 
-        for i in 0..Self::BOARD_SIZE {
-            if self.board[i].is_none() {
-                let mut new_game = self.clone();
-                new_game.board[i] = Some(Player::Computer);
-                let score = new_game.minimax(false);
-                if score > best_score {
-                    best_score = score;
-                    best_move = i;
+        for i in 0..Self::BOARD_SIDE {
+            for j in 0..Self::BOARD_SIDE {
+                if self.board[i][j].is_none() {
+                    let mut new_game = self.clone();
+                    new_game.board[i][j] = Some(Player::Computer);
+                    let score = new_game.minimax(false);
+                    if score > best_score {
+                        best_score = score;
+                        best_move = (i, j);
+                    }
                 }
             }
         }
@@ -173,7 +170,7 @@ impl Game {
         best_move
     }
 
-    fn get_computer_move(&self) -> usize {
+    fn get_computer_move(&self) -> (usize, usize) {
         self.get_best_move()
     }
 }
@@ -201,21 +198,40 @@ fn main() {
             break;
         }
 
-        let position = if game.current_player == Player::Human {
-            print!("Enter your move (0-{}): ", Game::BOARD_SIZE - 1);
+        let (x, y) = if game.current_player == Player::Human {
+            print!("Enter your move (x, y): ");
             io::stdout().flush().unwrap();
 
             let mut input = String::new();
             io::stdin().read_line(&mut input).unwrap();
 
-            input.trim().parse::<usize>().unwrap_or(9)
+            let input = input.trim().trim_matches(|c| c == '(' || c == ')');
+            let mut parts = input.split(',');
+            let x = parts
+                .next()
+                .unwrap_or_default()
+                .trim()
+                .parse::<usize>()
+                .unwrap_or(0);
+            let y = parts
+                .next()
+                .unwrap_or_default()
+                .trim()
+                .parse::<usize>()
+                .unwrap_or(0);
+
+            (x - 1, y - 1)
         } else {
-            let computer_move = game.get_computer_move();
-            println!("Computer chooses position {}", computer_move);
-            computer_move
+            let (computer_move_x, computer_move_y) = game.get_computer_move();
+            println!(
+                "Computer chooses position ({}, {})",
+                computer_move_x + 1,
+                computer_move_y + 1
+            );
+            (computer_move_x, computer_move_y)
         };
 
-        if !game.make_move(position) {
+        if !game.make_move(x, y) {
             println!("Invalid move. Try again.");
         }
     }
