@@ -9,10 +9,14 @@ This document is a place to jot down how different diffs/commits might make good
 
 Simple list of ideas with links to the code, and any explanation that we want to record
 
+Word Guess CLI Potential Bugs:
+- Incorrect win condition on line 65
+- Incorrect attempt of counting guesses on line 29
+- Remove input validation in the get_guess function on line 57
+
 
 ## Implemented In
 
 One we implement an idea we can move it to this section and link to the Byte it relates to
 
 - Simple Todo List with broken file persistance [PR #1](https://github.com/coreyja/toys/pull/1) - [Level 0.0](https://coreyja.cookd.dev/level-0-0)
-- Word Guess CLI [PR #4](https://github.com/coreyja/toys/pull/4) - [Level 0.3](cookd link)

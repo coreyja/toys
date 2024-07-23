@@ -8,7 +8,7 @@ fn main() {
     let mut guessed_letters = HashSet::new();
     let mut attempts_left = 6;
 
-    println!("Welcome to Hangman!");
+    println!("Welcome to Word Guess!");
     println!("The word has {} letters.", secret_word.len());
 
     while attempts_left > 0 {
