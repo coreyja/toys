@@ -12,9 +12,6 @@ Simple list of ideas with links to the code, and any explanation that we want to
 
 
 
-
-
-
 - Rock-Paper-Scissors CLI Potential Bugs:
     - Remove from ":?" from the curly braces on line 27
     - remove the ".trim()" from the input validation on line 21
