@@ -55,7 +55,7 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
     }
 }
 
-async fn hello_world() -> impl IntoResponse {
+async fn ws_input() -> impl IntoResponse {
     axum::response::Html(
         r#"
         <!DOCTYPE html>
@@ -105,7 +105,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/ws", get(ws_handler))
-        .route("/", get(hello_world))
+        .route("/", get(ws_input))
         .with_state(app_state);
 
     let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
