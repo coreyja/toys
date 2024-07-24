@@ -3,25 +3,23 @@ use axum::{
         ws::{Message, WebSocket, WebSocketUpgrade},
         State,
     },
-    response::{Html, IntoResponse},
+    response::IntoResponse,
     routing::get,
     Router,
 };
 use futures::SinkExt;
 use futures_util::StreamExt;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use tokio::select;
 use tokio::sync::broadcast;
 
 struct AppState {
     tx: Sender,
 }
+
 type Sender = broadcast::Sender<String>;
 
-pub async fn ws_handler(
-    ws: WebSocketUpgrade,
-    State(state): State<Arc<AppState>>,
-) -> impl IntoResponse {
+async fn ws_handler(ws: WebSocketUpgrade, State(state): State<Arc<AppState>>) -> impl IntoResponse {
     ws.on_upgrade(|socket| handle_socket(socket, state))
 }
 
