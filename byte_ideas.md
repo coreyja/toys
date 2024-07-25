@@ -15,6 +15,12 @@ Word Guess CLI Potential Bugs:
 - Remove input validation in the get_guess function on line 57
 
 
+
+
+- Rock-Paper-Scissors CLI Potential Bugs:
+    - Remove from ":?" from the curly braces on line 27
+    - remove the ".trim()" from the input validation on line 21
+
 ## Implemented In
 
 One we implement an idea we can move it to this section and link to the Byte it relates to
