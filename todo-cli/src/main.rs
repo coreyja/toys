@@ -31,6 +31,7 @@ fn main() {
 fn add_task(task: &str) {
     let mut file = OpenOptions::new()
         .create(true)
+        .append(true)
         .open("todo.txt")
         .expect("Failed to open file");
 
