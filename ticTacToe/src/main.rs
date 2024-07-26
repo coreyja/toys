@@ -115,12 +115,13 @@ impl Game {
         }
     }
 
-    fn minimax(&self, is_maximizing: bool) -> i32 {
+    fn minimax(&self, is_maximizing: bool) -> (i32, Option<(usize, usize)>) {
         if let Some(score) = self.evaluate_board() {
-            return score;
+            return (score, None);
         }
 
         let mut best_score = if is_maximizing { i32::MIN } else { i32::MAX };
+        let mut best_move = None;
 
         for i in 0..Self::BOARD_SIDE {
             for j in 0..Self::BOARD_SIDE {
@@ -131,42 +132,25 @@ impl Game {
                     } else {
                         Player::Human
                     });
-                    let score = new_game.minimax(!is_maximizing);
-                    best_score = if is_maximizing {
-                        best_score.max(score)
-                    } else {
-                        best_score.min(score)
+                    let score = new_game.minimax(!is_maximizing).0;
+                    if is_maximizing {
+                        if score > best_score {
+                            best_score = score;
+                            best_move = Some((i, j));
+                        }
+                    } else if score < best_score {
+                        best_score = score;
+                        best_move = Some((i, j));
                     };
                 }
             }
         }
 
-        best_score
-    }
-
-    fn get_best_move(&self) -> (usize, usize) {
-        let mut best_score = i32::MIN;
-        let mut best_move = (0, 0);
-
-        for i in 0..Self::BOARD_SIDE {
-            for j in 0..Self::BOARD_SIDE {
-                if self.board[i][j].is_none() {
-                    let mut new_game = self.clone();
-                    new_game.board[i][j] = Some(Player::Computer);
-                    let score = new_game.minimax(false);
-                    if score > best_score {
-                        best_score = score;
-                        best_move = (i, j);
-                    }
-                }
-            }
-        }
-
-        best_move
+        (best_score, best_move)
     }
 
     fn get_computer_move(&self) -> (usize, usize) {
-        self.get_best_move()
+        self.minimax(true).1.unwrap()
     }
 }
 
