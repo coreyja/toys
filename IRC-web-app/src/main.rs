@@ -64,11 +64,13 @@ async fn ws_input() -> impl IntoResponse {
         <body>
             <h1>WebSocket Chat</h1>
             <div id="messages"></div>
-            <input type="text" id="messageInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
+            <form>
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button type=submit>Send</button>
+            </form>
 
             <script>
-                const socket = new WebSocket('ws://127.0.0.1:3000/ws');
+                const socket = new WebSocket('/ws');
                 const messagesDiv = document.getElementById('messages');
                 const messageInput = document.getElementById('messageInput');
 
@@ -82,13 +84,17 @@ async fn ws_input() -> impl IntoResponse {
                     messagesDiv.appendChild(message);
                 };
 
-                function sendMessage() {
+                function sendMessage(e) {
+                    e.preventDefault();
+
                     const message = messageInput.value;
                     if (message) {
                         socket.send(message);
                         messageInput.value = '';
                     }
                 }
+
+                document.querySelector('form').addEventListener('submit', sendMessage);
             </script>
         </body>
         </html>
